@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VNetName": {
+            "type": "string",
+            "defaultValue":"OPS_3_Friday_Lab_Vnet",
+            "metadata": {
+                "description": "description"
+               
+            }
+        },
+        "feNSGName": {
+            "type": "string",
+            "defaultValue":"FrontEndNSG"
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "subnet1Name": "Backend",
+        "subnet2Name": "Frontend",
+        "submet3Name": "DataBase",
+        "VnetAddSpace": "10.0.0.0/16",
+        "FrontEndAdd": "10.0.1.0/24",
+        "BackEndAdd": "10.0.0.0/24",
+        "DBSubnetAdd": "10.0.2.0/24",
+        "sgRule": "Allow HTTP Trafic"     
+        
+    },
+    "resources": [
+        {
+            "name": "[parameters('VNetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('VNetName')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('VnetAddSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('BackEndAdd')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('FrontEndAdd')]"
+                        }
+                    },
+                                        {
+                        "name": "[variables('submet3Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('DBSubnetAdd')]"
+                        }
+                    }
+                ]
+            }
+        },
+      {
+        "name": "networkSecurityGroup1",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "securityRules": [
+                {
+                "name": "[variables('sgRule')]",
+                    "properties": {
+                        "description": "[variables('sgRule')]",
+                        "protocol": "Tcp",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "*",
+                        "sourceAddressPrefix": "*",
+                        "destinationAddressPrefix": "[variables('FrontEndAdd')-]",
+                        "access": "Allow",
+                        "priority": 100,
+                        "direction": "Inbound"
+                    }
+                }
+            ]
+        }
+      }
+    ],
+    "outputs": {}
+}
