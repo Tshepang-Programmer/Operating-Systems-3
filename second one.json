@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VNetName": {
+            "type": "string",
+            "defaultValue": "VNet",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "NSGName": {
+            "type": "string",
+            "defaultValue":"Network Security Group",
+            "metadata": {
+                "description": "description"
+            }
+        }
+        
+    },
+    "functions": [],
+    "variables": {
+        "BackEndNameS1": "BackEnd",
+        "FrontEndNameS2": "FrontEnd",
+        "DataBaseNameS3": "DataBase",
+
+        "VnetaddSpace": "192.168.0.0/16",
+        "BackendSubnet": "10.0.0.0/24",
+        "FrontEndSubnet": "10.0.1.0/24",
+        "DataBaseSubnet": "10.0.2.0/24"
+    },
+    "resources": [
+        {
+            "name": "[parameters('VNetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "virtualNetwork1"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('VnetaddSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('BackEndNameS1')]",
+                        "properties": {
+                            "addressPrefix": "[variables('BackendSubnet')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('FrontEndNameS2')]",
+                        "properties": {
+                            "addressPrefix": "[variables('FrontEndSubnet')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('DataBaseNameS3')]",
+                        "properties": {
+                            "addressPrefix": "[variables('DataBaseSubnet')]"
+                        }
+                    }
+                    
+                ]
+            }
+        },
+        {
+            "name": "",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "Block port 22",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "22",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {"name": "nsgRule2",
+                    "properties": {
+                          "description": "Allow port 88 and 443",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "88",
+                            "destinationPortRange": "88,443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "",
+                            "access": "Allow",
+                            "priority":101,
+                            "direction": "Inbound" 
+                    }
+                
+                    
+                    
+                    
+                     }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
